@@ -1,12 +1,12 @@
-A Phaser/Socket.IO Multiplayer version of the Tanks Mini game located here:
-https://phaser.io/examples/v2/games/tanks
+Basic template:
 
-Instructions:
-Install all the Dependencies.
-Go to the source files root path.
-Run node server.
+Expanding bitmap, birds eye view perspective.
+Player shoots bullets
+Enemies also shoot bullets
 
-The game port it runs on is 8081.
+Long range and short range classes
+Implement special abilities
 
-The DEMO Version is running here:
-http://vps128058.vps.ovh.ca:8081/
+Enemies (mobs) either chase you or run away from you and snipe
+
+Some obstacles (trees, rocks, bushes) can be destroyed by bullets

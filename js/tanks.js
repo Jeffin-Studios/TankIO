@@ -345,12 +345,12 @@ function fire () {
 }
 
 function shootPlayer (id, pid, x, y, v, r, tr) {
-        var bullet = bullets.children[id];
- var player = playerMap[pid];
- var theta = tr + r;
-        bullet.reset(x,y);
- bullet.rotation = theta;
- bullet.body.velocity = game.physics.arcade.velocityFromRotation(theta, v);
+    var bullet = bullets.children[id];
+    var player = playerMap[pid];
+    var theta = tr + r;
+    bullet.reset(x,y);
+    bullet.rotation = theta;
+    bullet.body.velocity = game.physics.arcade.velocityFromRotation(theta, v);
 }
 
 function render () {
