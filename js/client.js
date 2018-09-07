@@ -1,4 +1,3 @@
-
 var Client = {};
 Client.socket = io.connect(); // By default to localhost?
 
