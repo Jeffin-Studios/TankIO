@@ -12,7 +12,7 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.htm');
 });
 
-server.lastPlayerID = 0;
+server.lastPlayderID = 0;
 server.lastBulletID = 0;
 server.playersList = [];
 
@@ -52,11 +52,9 @@ io.on('connection', function(socket) {
   gSocket = socket;
   socket.on('newplayer', function() {
     socket.player = new Player(
-      server.lastPlayerID++,
-      // randomInt(-1000, 1000),
-      // randomInt(-1000, 1000)
-      0,
-      0
+      server.lastPlayderID++,
+      randomInt(-1000, 1000),
+      randomInt(-1000, 1000)
     );
     socket.emit('thisplayer', socket.player);
     socket.broadcast.emit('allplayers', getAllPlayers());
@@ -99,4 +97,23 @@ function getAllPlayers() {
     if (player) players.push(player);
   });
   return players;
+}
+
+function randomInt(low, high) {
+  return Math.floor(Math.random() * (high - low) + low);
+}
+
+function pointRectangleIntersection(p, r) {
+  console.log("p.x:" + p.x + ",p.y:" + p.y);
+  console.log("x1:" + r.x1 + ",y1:" + r.y1 + ",x2:" + r.x2 + ",y2:" + r.y2);
+  return p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2;
+}
+
+function rotatePoint(px, py, ox, oy, theta) {
+  var rx = Math.round(px * Math.cos(theta) - py * Math.sin(theta));
+  var ry = Math.round(px * Math.sin(theta) + py * Math.cos(theta));
+  return {
+    x: ox + rx,
+    y: oy + ry
+  };
 }

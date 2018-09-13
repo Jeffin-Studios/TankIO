@@ -1,7 +1,7 @@
 var land;
 
 var myPlayer;
-var players = {};
+var players;
 var bullets;
 
 var enemies;
@@ -254,14 +254,6 @@ function init() {
     update: update,
     render: render
   });
-
-  // // put code inside interval in update function main loop
-  // setInterval(function() {
-  //   if (myPlayer) {
-  //     // why not send the entire player object instead of justa few fields
-  //     Client.sendMovement(Math.round(myPlayer.tank.x), Math.round(myPlayer.tank.y), myPlayer.velocity, myPlayer.tank.rotation, myPlayer.turret.rotation);
-  //   }
-  // },100);
 }
 
 init();
@@ -372,55 +364,13 @@ function update() {
       }
     }
 
-    // These controls are "ROTMG mode". Toggle this instead of default if user presses R key
-    // if (cursors.left.isDown || leftKey.isDown) {
-    //   if (0 <= myPlayer.tank.angle <= 180) {
-    //     myPlayer.tank.angle -= 10;
-    //   }
-    //   else {
-    //     myPlayer.tank.angle += 10;
-    //   }
-    //   myPlayer.velocity = Math.min(myPlayer.velocity += 30, 300);
-    //   myPlayer.tank.animations.play('move');
-    // }
-    // else if (cursors.right.isDown || rightKey.isDown) {
-    //   myPlayer.tank.angle = Math.min(myPlayer.tank.angle += 10, 0);;
-    //   myPlayer.velocity = Math.min(myPlayer.velocity += 30, 300);
-    //   myPlayer.tank.animations.play('move');
-    // }
-    //
-    // if (cursors.up.isDown || upKey.isDown) {
-    //   //  The speed we'll travel at
-    //   myPlayer.tank.angle = Math.max(myPlayer.tank.angle += 10, -90);
-    //   myPlayer.velocity = Math.min(myPlayer.velocity += 30, 300);
-    //   myPlayer.tank.animations.play('move');
-    // }
-    // else if (cursors.down.isDown || downKey.isDown) {
-    //   myPlayer.tank.angle = 90;
-    //   myPlayer.velocity = Math.min(myPlayer.velocity += 30, 300);
-    //   myPlayer.tank.animations.play('move');
-    // }
-    // else {
-    //   if (myPlayer.velocity > 0) {
-    //     myPlayer.velocity -= 4;
-    //   }
-    //   else {
-    //     myPlayer.velocity += 4;
-    //   }
-    // }
-
     if (myPlayer.velocity != 0) {
       game.physics.arcade.velocityFromRotation(myPlayer.tank.rotation, myPlayer.velocity, myPlayer.tank.body.velocity);
     }
 
+    myPlayer.update();
     if (game.input.activePointer.isDown) {
       myPlayer.fire();
-    }
-
-    if (myPlayer) {
-      myPlayer.update();
-      // why not send the entire player object instead of justa few fields
-      Client.sendMovement(Math.round(myPlayer.tank.x), Math.round(myPlayer.tank.y), myPlayer.velocity, myPlayer.tank.rotation, myPlayer.turret.rotation);
     }
   }
 
@@ -472,9 +422,12 @@ function render() {
 
 function removeCover() {
   // unbind function and remove cover
-  cover.kill();
+  myPlayer = new Player(1, game, bullets, 0, 0);
   game.input.onDown.remove(removeCover, this);
-  Client.askNewPlayer();
+  game.camera.follow(myPlayer.tank);
+  // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+  game.camera.focusOnXY(0, 0);
+  cover.kill();
 }
 
 
@@ -541,43 +494,6 @@ function didCollide (player, enemy) {
     myPlayer.slow = true;
 }
 
-
-/*========================Client-Server Communication=========================*/
-/*============================================================================*/
-/*============================================================================*/
-
-
-var addThisPlayer = function(id,x,y){
-  myPlayer = addPlayer(id,x,y);
-  game.camera.follow(myPlayer.tank);
-  // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
-  game.camera.focusOnXY(0, 0);
-};
-
-var addExistingPlayer = function(id,x,y){
- if (myPlayer.id == id)
-     return;
- addPlayer(id,x,y);
-};
-
-var addPlayer = function(id,x,y){
- players[id] = new Player(id, game, bullets, x, y);
- return players[id];
-};
-
-var movePlayer = function(id,x,y,v,r,tr){
-    var player = players[id];
-    if (player == myPlayer || !player)  {
-      return;
-    }
-    // if (id == myPlayer.id || !player)  {
-    //   return;
-    // }
-
-    player.tank.rotation = r;
-    player.tank.x = x;
-    player.tank.y = y;
-    player.velocity = v;
-    player.turret.r = tr;
-    player.update();
-};
+// function adjust(character) {
+//   myPlayer.health = 100;
+// }
