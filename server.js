@@ -15,6 +15,7 @@ app.get('/', function(req, res) {
 server.lastPlayerID = 0;
 server.lastBulletID = 0;
 server.playersList = [];
+server.obstaclesList = {};
 
 server.listen(process.env.PORT || 8081, function() {
   console.log('Listening on ' + server.address().port);
@@ -39,27 +40,50 @@ var Player = function(id, x, y) {
   this.v = 0;
   this.r = 0;
   this.tr = 0;
-  this.health = 5;
-  this.score = 0;
+  //track health as field too?
   return this;
 };
 
-Player.maxHeath = 5;
-bullets = [];
-gSocket = null;
+var Obstacle = function(index, type, x, y) {
+  this.id = index;
+  this.type = type;
+  this.x = x;
+  this.y = y;
+  this.health = 200;
+  return this;
+};
+
+Obstacle.prototype.damage = function(impact = 1) {
+  this.health -= impact;
+  if (this.health <= 0) {
+    return true;
+  }
+  return false;
+};
+
+var gSocket = null;
+
+
+function generateObstacles() {
+  for (var i = 0; i < 50; i++) {
+    server.obstaclesList[i] = new Obstacle(i, 'rock', randomInt(-2000, 2000), randomInt(-2000, 2000)); //range given by world bounds
+  }
+}
+
+generateObstacles();
 
 io.on('connection', function(socket) {
   gSocket = socket;
+  socket.on('makeObstacles', function(){socket.emit("allObstacles", server.obstaclesList);});
   socket.on('newplayer', function() {
     socket.player = new Player(
       server.lastPlayerID++,
-      // randomInt(-1000, 1000),
-      // randomInt(-1000, 1000)
-      0,
-      0
+      randomInt(-1000, 1000),
+      randomInt(-1000, 1000)
     );
+    // server.playersList.push(socket.player);
     socket.emit('thisplayer', socket.player);
-    socket.broadcast.emit('allplayers', getAllPlayers());
+    socket.broadcast.emit('allplayers', getAllPlayers()); //change to socket.player instead of getAllPlayers() and see if it still works
     socket.emit('allplayers', getAllPlayers());
 
     socket.on('move', function(data) {
@@ -79,8 +103,24 @@ io.on('connection', function(socket) {
       socket.emit('shoot', bullet);
     });
 
+    socket.on('damage', function(data) {
+      if (data.type == 'obstacle')  {
+        var destroyed = server.obstaclesList[data.id].damage(data.impact);
+        if (destroyed)  {
+          io.emit('removeObstacle', {id: data.id});
+          delete server.obstaclesList[data.id]
+        }
+      }
+    });
+
+    socket.on('death', function(data) {
+      // server.playersList[socket.player.id] = null;
+      io.emit('remove',socket.player.id);
+    });
+
     socket.on('disconnect', function() {
-      io.emit('remove', socket.player.id);
+      // server.playersList[socket.player.id] = null;
+      io.emit('removePlayer',socket.player.id);
     });
   });
 
@@ -99,4 +139,8 @@ function getAllPlayers() {
     if (player) players.push(player);
   });
   return players;
+}
+
+function randomInt (low, high) {
+    return Math.floor(Math.random() * (high - low) + low);
 }

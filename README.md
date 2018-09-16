@@ -1,3 +1,10 @@
+Successfully made players and obstacles server side
+Make enemies, bullets, and explosions all server side 
+
+
+
+
+
 Architecture
 ===========
 Game instance has a gamemap (players list, enemies list, bullets list) that stores object data for each player and enemyBullets
@@ -43,6 +50,8 @@ Implement special abilities
 Enemies (mobs) either chase you or run away from you and snipe
 
 Some obstacles (trees, rocks, bushes) can be destroyed by bullets
+
+
 
 
 Fixes

@@ -6,8 +6,19 @@ Client.sendTest = function(){
     Client.socket.emit('test');
 };
 
-Client.askNewPlayer = function(){
+Client.makeNewPlayer = function(){
     Client.socket.emit('newplayer');
+};
+
+Client.death = function(id){
+  Client.socket.emit('death');
+};
+
+Client.damage = function(type, id, impact)  {
+  Client.socket.emit('damage', {type:type, id:id, impact:impact});
+};
+Client.makeObstacles = function(){
+  Client.socket.emit('makeObstacles');
 };
 
 Client.sendMovement = function(x,y,speed,rotation,turretRotation){
@@ -40,6 +51,16 @@ Client.socket.on('move',function(data){
     movePlayer(data.id,data.x,data.y,data.v,data.r,data.tr);
 });
 
-Client.socket.on('remove',function(id){
+Client.socket.on('removePlayer',function(id){
     removePlayer(id);
+});
+
+Client.socket.on('removeObstacle',function(data){
+    removeObstacle(data.id);
+});
+
+Client.socket.on('allObstacles',function(data){
+    for(var i = 0; i < 50; i++){
+        generateObstacles(data[i].id, data[i].type, data[i].x,data[i].y);
+    }
 });

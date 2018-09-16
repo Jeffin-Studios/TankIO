@@ -15,7 +15,7 @@ var cover;
 
 var cursors;
 
-var obstacles;
+var obstacles = {};
 var obstaclesTotal = 0;
 var obstaclesAlive = 0;
 
@@ -25,14 +25,12 @@ var obstaclesAlive = 0;
 // var Bullet = function(x, y, target, )
 // var Obstacle = function(type, )
 
-var Obstacle = function(index, game, type) {
-
-  var x = game.world.randomX;
-  var y = game.world.randomY;
-
+var Obstacle = function(index, game, type, x, y) {
+  this.id = index;
   this.game = game;
-  this.health = 200;
-  this.alive = true;
+  this.type = type;
+  this.x = x;
+  this.y = y
 
   this.shadow = game.add.sprite(x, y, 'obstacle', 'shadow');
   this.object = game.add.sprite(x, y, 'obstacle', 'tank1');
@@ -46,16 +44,6 @@ var Obstacle = function(index, game, type) {
   this.object.body.immovable = true;
 };
 
-Obstacle.prototype.damage = function(impact = 1) {
-  this.health -= impact;
-  if (this.health <= 0) {
-    this.alive = false;
-    this.object.kill();
-    this.shadow.kill();
-    return true;
-  }
-  return false;
-};
 
 var EnemyTank = function(index, game, target, follow = false) {
 
@@ -112,7 +100,7 @@ EnemyTank.prototype.update = function() {
         this.follow = true;
         this.rebound = false;
     }
-    if (this.target.alive && distance < 300) {
+    if (this.target.alive && distance < 500) {
       this.turret.rotation = this.game.physics.arcade.angleBetween(this.tank, this.target);
       if (this.follow)  {
         this.tank.rotation = game.physics.arcade.moveToObject(this.tank, this.target, this.velocity);
@@ -191,7 +179,7 @@ var Player = function(id, game, bullets, x, y) {
   this.bullets = bullets;
 };
 
-Player.prototype.update = function() {
+Player.prototype.update = function(local = true) {
   //  Position all the parts and align rotations
   if (!this.slow) {
     this.tank.body.maxVelocity.set(400,400);
@@ -204,7 +192,9 @@ Player.prototype.update = function() {
   this.turret.x = this.tank.x;
   this.turret.y = this.tank.y;
 
-  this.turret.rotation = game.physics.arcade.angleToPointer(this.turret);
+  if (local)  {
+    this.turret.rotation = game.physics.arcade.angleToPointer(this.turret);
+  }
   if (this.lifetime < 1000) {
     this.lifetime += 1;
   }
@@ -309,7 +299,7 @@ function create() {
   // myPlayer = new Player(1, game, bullets, 0, 0);
   // Make enemies (this will be done by server on new connection)
   generateEnemies();
-  generateObstacles();
+  Client.makeObstacles();
 
   //  Explosion pool
   explosions = game.add.group();
@@ -442,8 +432,8 @@ function update() {
   }
 
   obstaclesAlive = 0;
-  for (var i = 0; i < obstacles.length; i++) {
-    if (obstacles[i].alive) {
+  for (var i = 0; i < 50; i++) {
+    if (obstacles[i]) {
       obstaclesAlive++;
       if (myPlayer) {
         game.physics.arcade.collide(myPlayer.tank, obstacles[i].object);
@@ -474,7 +464,7 @@ function removeCover() {
   // unbind function and remove cover
   cover.kill();
   game.input.onDown.remove(removeCover, this);
-  Client.askNewPlayer();
+  Client.makeNewPlayer();
 }
 
 
@@ -490,16 +480,6 @@ function generateEnemies() {
   }
 }
 
-function generateObstacles() {
-  obstacles = [];
-  obstaclesTotal = 50;
-  obstaclesAlive = 50;
-
-  for (var i = 0; i < obstaclesTotal; i++) {
-    obstacles.push(new Obstacle(i, game, 'rock'));
-  }
-}
-
 function bulletHitPlayer(tank, bullet) {
   bullet.kill();
   var destroyed = myPlayer.damage(5);
@@ -507,6 +487,7 @@ function bulletHitPlayer(tank, bullet) {
     var explosionAnimation = explosions.getFirstExists(false);
     explosionAnimation.reset(tank.x, tank.y);
     explosionAnimation.play('kaboom', 30, false, true);
+    Client.death();
   }
 }
 
@@ -526,12 +507,7 @@ function bulletHitEnemy(tank, bullet) {
 function bulletHitObstacle(obstacle, bullet)  {
   bullet.kill();
   clearTimeout(bullet.expire);
-  var destroyed = obstacles[obstacle.name].damage(5);
-  if (destroyed) {
-    var explosionAnimation = explosions.getFirstExists(false);
-    explosionAnimation.reset(obstacle.x, obstacle.y);
-    explosionAnimation.play('kaboom', 30, false, true);
-  }
+  Client.damage('obstacle', obstacle.name, 5);
 }
 
 function didCollide (player, enemy) {
@@ -567,17 +543,37 @@ var addPlayer = function(id,x,y){
 
 var movePlayer = function(id,x,y,v,r,tr){
     var player = players[id];
-    if (player == myPlayer || !player)  {
+    if (id == myPlayer.id || !player)  {
       return;
     }
-    // if (id == myPlayer.id || !player)  {
-    //   return;
-    // }
+    if (player.alive) {
+      player.tank.rotation = r;
+      player.tank.x = x;
+      player.tank.y = y;
+      player.velocity = v;
+      player.turret.rotation = tr;
+      player.update(false);
+    }
+};
 
-    player.tank.rotation = r;
-    player.tank.x = x;
-    player.tank.y = y;
-    player.velocity = v;
-    player.turret.r = tr;
-    player.update();
+var removePlayer = function(id){
+    if (players[id]) {
+        players[id].tank.destroy();
+        players[id].shadow.destroy();
+        players[id].turret.destroy();
+        delete players[id];
+    }
+};
+
+var generateObstacles = function(id, type, x, y) {
+  obstacles[id] = new Obstacle(id, game, type, x, y);
+};
+
+var removeObstacle = function(id)  {
+  var explosionAnimation = explosions.getFirstExists(false);
+  explosionAnimation.reset(obstacles[id].x, obstacles[id].y);
+  explosionAnimation.play('kaboom', 30, false, true);
+  obstacles[id].object.destroy();
+  obstacles[id].shadow.destroy();
+  delete obstacles[id];
 };
