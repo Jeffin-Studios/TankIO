@@ -1,6 +1,15 @@
-Successfully made players and obstacles server side
-Make enemies, bullets, and explosions all server side 
+Make rock obstacles, where hitbox is entire thing, unlike trees
+Make grassy patch. Tanks get stealth. Following enemies stop following, but if enemy tank wanders in and bumps into you, bad news
+Make slimy path. Slows down tank
 
+Make powerups (used by spacebar)
+1. stealth
+2. ghost (pass through obstacles, tanks)
+3. summon (summon a wall)
+4. stun (shoots slow moving stun projectile)
+5. bombard (explosive attack, heavy damage to multiple targets)
+6. Shield (deflects attack)
+7. multi-directinal (shoots in multiple directions simultaneously)
 
 
 

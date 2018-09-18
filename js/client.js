@@ -60,7 +60,7 @@ Client.socket.on('removeObstacle',function(data){
 });
 
 Client.socket.on('allObstacles',function(data){
-    for(var i = 0; i < 50; i++){
-        generateObstacles(data[i].id, data[i].type, data[i].x,data[i].y);
+    for(var id in data){
+        generateObstacles(id, data[id].type, data[id].x, data[id].y);
     }
 });

@@ -65,8 +65,13 @@ var gSocket = null;
 
 
 function generateObstacles() {
-  for (var i = 0; i < 50; i++) {
-    server.obstaclesList[i] = new Obstacle(i, 'rock', randomInt(-2000, 2000), randomInt(-2000, 2000)); //range given by world bounds
+  for (var i = 0; i < 100; i++) {
+    if (i < 80) {
+      server.obstaclesList[i] = new Obstacle(i, 'tree', randomInt(-2000, 2000), randomInt(-2000, 2000));
+    }
+    else {
+      server.obstaclesList[i] = new Obstacle(i, 'boulder', randomInt(-2000, 2000), randomInt(-2000, 2000));
+    }
   }
 }
 
@@ -74,7 +79,8 @@ generateObstacles();
 
 io.on('connection', function(socket) {
   gSocket = socket;
-  socket.on('makeObstacles', function(){socket.emit("allObstacles", server.obstaclesList);});
+  var obstacles = server.obstaclesList;
+  socket.on('makeObstacles', function(){socket.emit("allObstacles", obstacles);});
   socket.on('newplayer', function() {
     socket.player = new Player(
       server.lastPlayerID++,
@@ -104,7 +110,7 @@ io.on('connection', function(socket) {
     });
 
     socket.on('damage', function(data) {
-      if (data.type == 'obstacle')  {
+      if (data.type == 'obstacle' && server.obstaclesList[data.id])  {
         var destroyed = server.obstaclesList[data.id].damage(data.impact);
         if (destroyed)  {
           io.emit('removeObstacle', {id: data.id});
@@ -115,7 +121,7 @@ io.on('connection', function(socket) {
 
     socket.on('death', function(data) {
       // server.playersList[socket.player.id] = null;
-      io.emit('remove',socket.player.id);
+      io.emit('removePlayer',socket.player.id);
     });
 
     socket.on('disconnect', function() {

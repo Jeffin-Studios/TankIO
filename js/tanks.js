@@ -32,15 +32,30 @@ var Obstacle = function(index, game, type, x, y) {
   this.x = x;
   this.y = y
 
-  this.shadow = game.add.sprite(x, y, 'obstacle', 'shadow');
-  this.object = game.add.sprite(x, y, 'obstacle', 'tank1');
-  this.object.bringToTop();
-  this.object.name = index.toString();
+  this.object;
+  this.skin;
 
-  this.object.anchor.set(0.5);
-  this.shadow.anchor.set(0.5);
+  if (type == 'tree') {
+    this.object = game.add.sprite(x, y, 'obstacle', 'hitbox');
+    this.skin = game.add.sprite(x, y, 'tree');
+
+    this.object.name = index.toString();
+
+    this.object.anchor.set(0.5);
+    this.skin.anchor.set(0.5, 0.8);
+  }
+  else if (type == 'boulder') {
+    this.object = game.add.sprite(x, y, 'obstacle', 'hitbox1');
+    this.skin = game.add.sprite(x, y, 'boulder');
+
+    this.object.name = index.toString();
+
+    this.object.anchor.set(0.5);
+    this.skin.anchor.set(0.5);
+  }
 
   game.physics.enable(this.object, Phaser.Physics.ARCADE);
+  this.skin.bringToTop();
   this.object.body.immovable = true;
 };
 
@@ -60,6 +75,7 @@ var EnemyTank = function(index, game, target, follow = false) {
   this.rebound = false;
   this.velocity = 100;
   this.attacked = false;
+  this.range = 500;
 
   this.shadow = game.add.sprite(x, y, 'enemy', 'shadow');
   this.tank = game.add.sprite(x, y, 'enemy', 'tank1');
@@ -100,7 +116,7 @@ EnemyTank.prototype.update = function() {
         this.follow = true;
         this.rebound = false;
     }
-    if (this.target.alive && distance < 500) {
+    if (this.target.alive && distance < this.range) {
       this.turret.rotation = this.game.physics.arcade.angleBetween(this.tank, this.target);
       if (this.follow)  {
         this.tank.rotation = game.physics.arcade.moveToObject(this.tank, this.target, this.velocity);
@@ -260,6 +276,10 @@ function preload() {
   game.load.atlas('tank', 'assets/games/tanks/tanks.png', 'assets/games/tanks/tanks.json');
   game.load.atlas('enemy', 'assets/games/tanks/enemy-tanks.png', 'assets/games/tanks/tanks.json');
   game.load.atlas('obstacle', 'assets/games/tanks/enemy-tanks.png', 'assets/games/tanks/tanks.json');
+  game.load.image('hitbox', 'assets/games/tanks/hitbox.png');
+  game.load.image('hitbox1', 'assets/games/tanks/hitbox1.png');
+  game.load.image('tree', 'assets/games/tanks/tree.png');
+  game.load.image('boulder', 'assets/games/tanks/boulder.png');
   game.load.image('cover', 'assets/games/tanks/logo.png');
   game.load.image('bullet', 'assets/games/tanks/bullet.png');
   game.load.image('earth', 'assets/games/tanks/scorched_earth.png');
@@ -432,18 +452,18 @@ function update() {
   }
 
   obstaclesAlive = 0;
-  for (var i = 0; i < 50; i++) {
-    if (obstacles[i]) {
+  for (var id in obstacles) {
+    if (obstacles[id]) {
       obstaclesAlive++;
       if (myPlayer) {
-        game.physics.arcade.collide(myPlayer.tank, obstacles[i].object);
+        game.physics.arcade.collide(myPlayer.tank, obstacles[id].object);
       }
       for (var j = 0; j < enemies.length; j++) {
-        game.physics.arcade.collide(enemies[j].tank, obstacles[i].object);
+        game.physics.arcade.collide(enemies[j].tank, obstacles[id].object);
       }
 
-      game.physics.arcade.overlap(bullets, obstacles[i].object, bulletHitObstacle, null, this);
-      game.physics.arcade.overlap(enemyBullets, obstacles[i].object, bulletHitObstacle, null, this);
+      game.physics.arcade.overlap(bullets, obstacles[id].object, bulletHitObstacle, null, this);
+      game.physics.arcade.overlap(enemyBullets, obstacles[id].object, bulletHitObstacle, null, this);
     }
   }
 
@@ -465,6 +485,7 @@ function removeCover() {
   cover.kill();
   game.input.onDown.remove(removeCover, this);
   Client.makeNewPlayer();
+  Client.makeObstacles();
 }
 
 
@@ -475,8 +496,6 @@ function generateEnemies() {
 
   for (var i = 0; i < enemiesTotal; i++) {
     enemies.push(new EnemyTank(i, game, null, true));
-    // enemies[i].tank.body.onWorldBounds = new Phaser.Signal();
-    // enemies[i].tank.body.onWorldBounds.add(adjust, this);
   }
 }
 
@@ -566,6 +585,11 @@ var removePlayer = function(id){
 };
 
 var generateObstacles = function(id, type, x, y) {
+  if (obstacles[id])  {
+    obstacles[id].object.destroy();
+    obstacles[id].skin.destroy();
+    delete obstacles[id];
+  }
   obstacles[id] = new Obstacle(id, game, type, x, y);
 };
 
@@ -574,6 +598,6 @@ var removeObstacle = function(id)  {
   explosionAnimation.reset(obstacles[id].x, obstacles[id].y);
   explosionAnimation.play('kaboom', 30, false, true);
   obstacles[id].object.destroy();
-  obstacles[id].shadow.destroy();
+  obstacles[id].skin.destroy();
   delete obstacles[id];
 };
