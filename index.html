@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)http://examples.phaser.io/embed.php?f=games/tanks.js -->
+<html>
+	<head>
+		<script type="text/javascript"  src="js/phaser.min.js"></script>
+		<script type="text/javascript" src="socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="./bower_components/log/log.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+  </head>
+  <body>
+    <div id = "chat">
+  		<ul id="messages"></ul>
+      <form id = "chatbox" action="">
+        <input id="input" autocomplete="off" />
+        <button id = "send">Send</button>
+      </form>
+  		<script type="text/javascript"  src="js/tanks.js"></script>
+  		<script type="text/javascript"  src="js/client.js"></script>
+      <!-- <script>
+        $(function () {
+          var socket = io();
+          $('form').submit(function(){
+            socket.emit('chat message', $('#input').val());
+            $('#input').val('');
+            return false;
+          });
+          socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+          });
+        });
+      </script> -->
+    </div>
+	</body>
+</html>

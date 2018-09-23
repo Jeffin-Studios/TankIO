@@ -9,7 +9,7 @@ app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use('/assets', express.static(__dirname + '/assets'));
 
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.htm');
+  res.sendFile(__dirname + '/index.html');
 });
 
 server.lastPlayerID = 0;

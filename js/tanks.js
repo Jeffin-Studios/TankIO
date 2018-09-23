@@ -254,7 +254,7 @@ Player.prototype.fire = function() {
 
 
 function init() {
-  game = new Phaser.Game(window.innerWidth - 500, window.innerHeight - 20, Phaser.AUTO, 'phaser-example', {
+  game = new Phaser.Game(window.innerWidth - 500, window.innerHeight, Phaser.AUTO, 'phaser-example', {
     preload: preload,
     create: create,
     update: update,

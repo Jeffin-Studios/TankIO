@@ -1,0 +1,30 @@
+{
+  "name": "tankio",
+  "version": "1.0.0",
+  "description": "Cool IO game (soon to be multiplayer) made with Node.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeffin-Studios/TankIO.git"
+  },
+  "keywords": [
+    "Node",
+    "Heroku",
+    "Phaser"
+  ],
+  "author": "Richard Bao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jeffin-Studios/TankIO/issues"
+  },
+  "homepage": "https://github.com/Jeffin-Studios/TankIO#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "http": "0.0.0",
+    "socketio": "^1.0.0"
+  }
+}
