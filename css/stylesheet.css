@@ -18,6 +18,8 @@
 
 #messages {
   min-height: 95%;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 #chatbox  {

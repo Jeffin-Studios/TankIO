@@ -16,19 +16,21 @@
       </form>
   		<script type="text/javascript"  src="js/tanks.js"></script>
   		<script type="text/javascript"  src="js/client.js"></script>
-      <!-- <script>
-        $(function () {
-          var socket = io();
-          $('form').submit(function(){
-            socket.emit('chat message', $('#input').val());
-            $('#input').val('');
-            return false;
-          });
-          socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
-          });
-        });
-      </script> -->
+			<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+			<script>
+				$(function () {
+					var socket = io();
+					$('form').submit(function(){
+						socket.emit('chatmessage', $('#input').val());
+						$('#input').val('');
+						return false;
+					});
+					socket.on('chatmessage', function(msg){
+						$('#messages').append($('<li>').text(msg));
+					});
+				});
+			</script>
     </div>
 	</body>
 </html>

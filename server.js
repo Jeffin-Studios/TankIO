@@ -78,6 +78,10 @@ function generateObstacles() {
 generateObstacles();
 
 io.on('connection', function(socket) {
+  socket.on('chatmessage', function(msg){
+    io.emit('chatmessage', msg);
+  });
+
   gSocket = socket;
   var obstacles = server.obstaclesList;
   socket.on('makeObstacles', function(){socket.emit("allObstacles", obstacles);});
