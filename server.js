@@ -79,7 +79,7 @@ generateObstacles();
 
 io.on('connection', function(socket) {
   socket.on('chatmessage', function(msg){
-    io.emit('chatmessage', msg);
+    socket.broadcast.emit('chatmessage', msg);
   });
 
   gSocket = socket;

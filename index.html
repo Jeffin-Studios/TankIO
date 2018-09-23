@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
   </head>
   <body>
+		<div id = "game">
+		</div>
     <div id = "chat">
   		<ul id="messages"></ul>
       <form id = "chatbox" action="">
@@ -22,6 +24,7 @@
 				$(function () {
 					var socket = io();
 					$('form').submit(function(){
+						$('#messages').append($('<li style = "color: blue;">').text($('#input').val()));
 						socket.emit('chatmessage', $('#input').val());
 						$('#input').val('');
 						return false;
