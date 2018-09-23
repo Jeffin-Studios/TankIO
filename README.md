@@ -1,3 +1,9 @@
+Hosted On Heroku: https://phasertanksio.herokuapp.com/
+
+
+
+Ignore the text below, those are development notes.
+
 Make rock obstacles, where hitbox is entire thing, unlike trees
 Make grassy patch. Tanks get stealth. Following enemies stop following, but if enemy tank wanders in and bumps into you, bad news
 Make slimy path. Slows down tank
