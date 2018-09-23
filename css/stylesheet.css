@@ -17,20 +17,39 @@
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   float: right;
-  background-color: lightgray;
+  background-color: #f2f2f2;
   height: 100vh;
   width: 500px;
   border-style: solid;
   border-width: 5px;
   border-color: gray;
 }
+
 #messages {
   min-height: 95%;
-  padding-left: 20px;
-  padding-right: 20px;
   list-style: none;
   overflow: auto;
 }
+
+#messages .otherchat {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top:5px;
+  padding-bottom:5px;
+  background: lightgray;
+  color: midnightblue;
+}
+
+#messages .mychat {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top:5px;
+  padding-bottom:5px;
+  background: lightblue;
+  color: white;
+  /* text-align: right; */
+}
+
 
 #chatbox  {
   width: 100%;

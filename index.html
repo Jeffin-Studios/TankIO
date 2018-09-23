@@ -24,13 +24,13 @@
 				$(function () {
 					var socket = io();
 					$('form').submit(function(){
-						$('#messages').append($('<li style = "color: blue;">').text($('#input').val()));
+						$('#messages').append($('<li class = "mychat">').text($('#input').val()));
 						socket.emit('chatmessage', $('#input').val());
 						$('#input').val('');
 						return false;
 					});
 					socket.on('chatmessage', function(msg){
-						$('#messages').append($('<li>').text(msg));
+						$('#messages').append($('<li class = "otherchat">').text(msg));
 					});
 				});
 			</script>
