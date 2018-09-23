@@ -25,12 +25,12 @@
 					var socket = io();
 					$('form').submit(function(){
 						$('#messages').append($('<li class = "mychat">').text($('#input').val()));
-						socket.emit('chatmessage', $('#input').val());
+						socket.emit('chatmessage', {msg: $('#input').val()});
 						$('#input').val('');
 						return false;
 					});
-					socket.on('chatmessage', function(msg){
-						$('#messages').append($('<li class = "otherchat">').text(msg));
+					socket.on('chatmessage', function(data){
+						$('#messages').append($('<li class = "otherchat">').text(data.msg));
 					});
 				});
 			</script>

@@ -77,9 +77,16 @@ function generateObstacles() {
 
 generateObstacles();
 
+server.chatList = [];
+
 io.on('connection', function(socket) {
-  socket.on('chatmessage', function(msg){
-    socket.broadcast.emit('chatmessage', msg);
+  for (var i = 0; i < server.chatList.length; i++)  {
+    var chat = server.chatList[i];
+    socket.emit('chatmessage', chat);
+  }
+  socket.on('chatmessage', function(data){
+    server.chatList.push(data);
+    socket.broadcast.emit('chatmessage', data);
   });
 
   gSocket = socket;
